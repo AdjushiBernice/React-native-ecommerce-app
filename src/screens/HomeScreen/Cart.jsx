@@ -1,45 +1,100 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { CartContext } from '../../../CartContext.jsx';
+import React, { useEffect, useState, useContext } from "react";
+import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import { CartContext } from "../../../CartContext.jsx";
+import { RadioButton } from "react-native-paper";
 
 export function Cart({ navigation }) {
   const { items, removeItemFromCart, getItemsCount, getTotalPrice } = useContext(CartContext);
+  const [showRentModal, setShowRentModal] = useState(false);
+  const [rentalDays, setRentalDays] = useState(1);
+  const [rentalPrice, setRentalPrice] = useState('');
+const [totalRentalPrice, setTotalRentalPrice] = useState(false);
 
   function CartItem({ item }) {
     const handleRemoveItem = () => {
       removeItemFromCart(item.id);
     };
 
+    const handleRentButton = () => {
+      setShowRentModal(true);
+    };
+
+
+
+    const handleRentConfirm = () => {
+      let totalPrice = item.product.price / 4 * rentalDays;
+      // Perform actions based on the calculated total price
+      setRentalPrice(totalPrice);
+  setTotalRentalPrice(true);
+      console.log(`Total Price for ${rentalDays} days: $${totalPrice}`);
+      setShowRentModal(false);
+      return totalPrice
+    };
+
+    const handleRentCancel = () => {
+      setShowRentModal(false);
+    };
+
+    let rental = item.product.price / 4;
+
     return (
       <View>
         <Text>{item.product.name}</Text>
         <Text>Quantity: {item.qty}</Text>
+        
         <Text>Total Price: $ {item.totalPrice}</Text>
+        <Text>Rental Price: ${rentalPrice ? rentalPrice : rental}</Text>
         <TouchableOpacity onPress={handleRemoveItem}>
           <Text style={styles.removeButton}>Remove</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={handleRentButton}>
+          <Text style={styles.removeButton}>Rent</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleRentButton}>
+          <Text style={styles.removeButton}>Buy</Text>
+        </TouchableOpacity>
+        <Modal visible={showRentModal} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text>Select rental duration:</Text>
+              {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+                <TouchableOpacity
+                  key={value}
+                  style={styles.radioButtonContainer}
+                  onPress={() => setRentalDays(value)}
+                >
+                  <Text>{`${value} day${value > 1 ? 's' : ''}`}</Text>
+                  <RadioButton
+                    value={value}
+                    status={rentalDays === value ? 'checked' : 'unchecked'}
+                  />
+                </TouchableOpacity>
+              ))}
+              <Button title="Confirm" onPress={handleRentConfirm} />
+              <Button title="Cancel" onPress={handleRentCancel} />
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
 
   function Totals() {
     let [total, setTotal] = useState(0);
-  
+
     useEffect(() => {
       setTotal(Number(getTotalPrice())); // Convert the total to a number
     }, [items]);
-  
+
     return (
       <View style={styles.cartLineTotal}>
         <Text style={[styles.lineLeft, styles.lineTotal]}>Total</Text>
-        <Text style={styles.lineRight}>$ {total}</Text>
+        <Text style={styles.lineRight}>$ {totalRentalPrice ? rentalPrice : total}</Text>
       </View>
     );
   }
-  
-  const renderItem = ({ item }) => (
-    <CartItem item={item} />
-  );
+
+  const renderItem = ({ item }) => <CartItem item={item} />;
 
   return (
     <FlatList
@@ -55,39 +110,56 @@ export function Cart({ navigation }) {
 
 const styles = StyleSheet.create({
   cartLine: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   cartLineTotal: {
-    flexDirection: 'row',
-    borderTopColor: '#dddddd',
+    flexDirection: "row",
+    borderTopColor: "#dddddd",
     borderTopWidth: 1,
   },
   lineTotal: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   lineLeft: {
     fontSize: 20,
     lineHeight: 40,
-    color: '#333333',
+    color: "#333333",
   },
   lineRight: {
     flex: 1,
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     lineHeight: 40,
-    color: '#333333',
-    textAlign: 'right',
+    color: "#333333",
+    textAlign: "right",
   },
   itemsList: {
-    backgroundColor: '#eeeeee',
+    backgroundColor: "#eeeeee",
   },
   itemsListContainer: {
-    backgroundColor: '#eeeeee',
+    backgroundColor: "#eeeeee",
     paddingVertical: 8,
     marginHorizontal: 8,
   },
   removeButton: {
-    color: 'red',
-    fontWeight: 'bold',
+    color: "red",
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  radioButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
 });

@@ -4,6 +4,7 @@ const Products = [
     image: require("../../assets/productsimage/nike-air-monarch.png"),
     title: "Nike Air Monarch IV",
     price: "200",
+    rentPrice: '20',
     company: "Nike",
     color: "white",
     category: "sneakers",
@@ -189,6 +190,7 @@ const Products = [
     price: "50",
     company: "Vans",
     color: "black",
+    rentPrice: "25",
     category: "heels",
   },
   {
