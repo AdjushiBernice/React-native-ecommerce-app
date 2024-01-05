@@ -1,34 +1,46 @@
 import React, { useEffect, useState, useContext } from "react";
-import { View, Text, Button, FlatList, StyleSheet, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import { CartContext } from "../../../CartContext.jsx";
 import { RadioButton } from "react-native-paper";
 
 export function Cart({ navigation }) {
-  const { items, removeItemFromCart, getItemsCount, getTotalPrice } = useContext(CartContext);
+  const { items, removeItemFromCart, getItemsCount, getTotalPrice } =
+    useContext(CartContext);
   const [showRentModal, setShowRentModal] = useState(false);
+  const [productPrice, setProdutPrice] = useState("");
   const [rentalDays, setRentalDays] = useState(1);
-  const [rentalPrice, setRentalPrice] = useState('');
-const [totalRentalPrice, setTotalRentalPrice] = useState(false);
+  const [rentalPrice, setRentalPrice] = useState("");
+  const [totalRentalPrice, setTotalRentalPrice] = useState(false);
 
   function CartItem({ item }) {
     const handleRemoveItem = () => {
       removeItemFromCart(item.id);
+      setRentalPrice(0)
     };
 
     const handleRentButton = () => {
       setShowRentModal(true);
     };
-
-
+    const handleBuyButton = () => {
+      let initialPrice = item.product.price;
+      setProdutPrice(initialPrice);
+    };
 
     const handleRentConfirm = () => {
-      let totalPrice = item.product.price / 4 * rentalDays;
-      // Perform actions based on the calculated total price
+      let totalPrice = (item.product.price / 4) * rentalDays;
       setRentalPrice(totalPrice);
-  setTotalRentalPrice(true);
+      setTotalRentalPrice(true);
       console.log(`Total Price for ${rentalDays} days: $${totalPrice}`);
       setShowRentModal(false);
-      return totalPrice
+      return totalPrice;
     };
 
     const handleRentCancel = () => {
@@ -41,17 +53,17 @@ const [totalRentalPrice, setTotalRentalPrice] = useState(false);
       <View>
         <Text>{item.product.name}</Text>
         <Text>Quantity: {item.qty}</Text>
-        
+
         <Text>Total Price: $ {item.totalPrice}</Text>
         <Text>Rental Price: ${rentalPrice ? rentalPrice : rental}</Text>
         <TouchableOpacity onPress={handleRemoveItem}>
           <Text style={styles.removeButton}>Remove</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleRentButton}>
-          <Text style={styles.removeButton}>Rent</Text>
+          <Text style={styles.rentButton}>Rent</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleRentButton}>
-          <Text style={styles.removeButton}>Buy</Text>
+        <TouchableOpacity onPress={handleBuyButton}>
+          <Text style={styles.rentButton}>Buy</Text>
         </TouchableOpacity>
         <Modal visible={showRentModal} animationType="slide">
           <View style={styles.modalContainer}>
@@ -63,10 +75,10 @@ const [totalRentalPrice, setTotalRentalPrice] = useState(false);
                   style={styles.radioButtonContainer}
                   onPress={() => setRentalDays(value)}
                 >
-                  <Text>{`${value} day${value > 1 ? 's' : ''}`}</Text>
+                  <Text>{`${value} day${value > 1 ? "s" : ""}`}</Text>
                   <RadioButton
                     value={value}
-                    status={rentalDays === value ? 'checked' : 'unchecked'}
+                    status={rentalDays === value ? "checked" : "unchecked"}
                   />
                 </TouchableOpacity>
               ))}
@@ -83,13 +95,19 @@ const [totalRentalPrice, setTotalRentalPrice] = useState(false);
     let [total, setTotal] = useState(0);
 
     useEffect(() => {
-      setTotal(Number(getTotalPrice())); // Convert the total to a number
+      if (items.length > 0) {
+        setTotal(Number(getTotalPrice()));
+      } else {
+        setTotal(0);
+      }
     }, [items]);
 
     return (
       <View style={styles.cartLineTotal}>
         <Text style={[styles.lineLeft, styles.lineTotal]}>Total</Text>
-        <Text style={styles.lineRight}>$ {totalRentalPrice ? rentalPrice : total}</Text>
+        <Text style={styles.lineRight}>
+          $ {totalRentalPrice ? rentalPrice : total}
+        </Text>
       </View>
     );
   }
@@ -145,21 +163,25 @@ const styles = StyleSheet.create({
     color: "red",
     fontWeight: "bold",
   },
+  rentButton: {
+    fontWeight: "bold",
+    color: "blue",
+  },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
     elevation: 5,
   },
   radioButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
 });
