@@ -23,7 +23,7 @@ export function Cart({ navigation }) {
   function CartItem({ item }) {
     const handleRemoveItem = () => {
       removeItemFromCart(item.id);
-      setRentalPrice(0)
+      setRentalPrice(0);
     };
 
     const handleRentButton = () => {
@@ -32,6 +32,7 @@ export function Cart({ navigation }) {
     const handleBuyButton = () => {
       let initialPrice = item.product.price;
       setProdutPrice(initialPrice);
+      navigation.navigate("PaymentScreen");
     };
 
     const handleRentConfirm = () => {
@@ -65,7 +66,7 @@ export function Cart({ navigation }) {
         <TouchableOpacity onPress={handleBuyButton}>
           <Text style={styles.rentButton}>Buy</Text>
         </TouchableOpacity>
-        <Modal visible={showRentModal} animationType="slide">
+        <Modal visible={showRentModal} animationType="none">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text>Select rental duration:</Text>
@@ -82,8 +83,10 @@ export function Cart({ navigation }) {
                   />
                 </TouchableOpacity>
               ))}
-              <Button title="Confirm" onPress={handleRentConfirm} />
-              <Button title="Cancel" onPress={handleRentCancel} />
+              <View style={styles.buttons}>
+                <Button title="Confirm" onPress={handleRentConfirm} />
+                <Button title="Cancel" onPress={handleRentCancel} />
+              </View>
             </View>
           </View>
         </Modal>
@@ -175,8 +178,10 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "white",
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 5,
     elevation: 5,
+    borderWidth: 2,
+    borderColor: "ccc",
   },
   radioButtonContainer: {
     flexDirection: "row",
