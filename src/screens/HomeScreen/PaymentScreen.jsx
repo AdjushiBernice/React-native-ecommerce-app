@@ -1,14 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useRef } from 'react';
+import  { Paystack , paystackProps}  from 'react-native-paystack-webview';
+import { View, TouchableOpacity,Text } from 'react-native';
 
-const PaymentScreen = () => {
+function PaymentScreen(){
+  const paystackWebViewRef = useRef(); 
+
   return (
-    <View>
-      <Text>PaymentScreen</Text>
-    </View>
-  )
+    <View></View>
+  );
 }
-
-export default PaymentScreen
-
-const styles = StyleSheet.create({})
